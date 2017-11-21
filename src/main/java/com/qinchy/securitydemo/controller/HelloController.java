@@ -15,4 +15,9 @@ public class HelloController {
         model.addAttribute("msg",msg);
         return "index";
     }
+
+    @RequestMapping(path = {"/login"})
+    public String login(Model model){
+        return "login";
+    }
 }
