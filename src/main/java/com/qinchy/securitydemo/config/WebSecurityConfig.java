@@ -42,6 +42,6 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     public void configureGlobal(AuthenticationManagerBuilder auth) throws Exception {
         auth
                 .inMemoryAuthentication()
-                .withUser("user").password("password").roles("admin");
+                .withUser("username").password("password").roles("ADMIN");  //这里ADMIN角色不能加ROLE前缀，框架会自动加，但是数据库中sys_role表需要加（例如ROLE_ADMIN)
     }
 }

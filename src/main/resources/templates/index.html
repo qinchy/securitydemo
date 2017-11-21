@@ -13,7 +13,8 @@
         <div>
             <p class="bg-info" th:text="${msg.extraInfo}"></p>
         </div>
-        <div sec:authorize="hasRole('admin')">
+        <!-- 这里ADMIN角色不能加ROLE前缀，框架会自动加，但是数据库中sys_role表需要加（例如ROLE_ADMIN) -->
+        <div sec:authorize="hasRole('ADMIN')">
             <p class="bg-info">无更多显示信息</p>
         </div>
         <form th:action="@{/logout}" method="post">
