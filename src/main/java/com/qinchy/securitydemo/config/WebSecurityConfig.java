@@ -1,7 +1,7 @@
 package com.qinchy.securitydemo.config;
 
+import com.qinchy.securitydemo.common.MD5Util;
 import com.qinchy.securitydemo.service.CustomerUserService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
@@ -9,7 +9,11 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
+/**
+ * @author Administrator
+ */
 @Configuration
 @EnableWebSecurity
 public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
@@ -20,8 +24,19 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
     @Override
     protected void configure(AuthenticationManagerBuilder auth) throws Exception {
-        // 添加自定义的userDetailService用来认证
-        auth.userDetailsService(customUserService());
+        // 添加自定义的userDetailService用来认证，适用md5对密码加密
+        auth.userDetailsService(customUserService()).passwordEncoder(new PasswordEncoder() {
+
+            @Override
+            public String encode(CharSequence rawPassword) {
+                return MD5Util.encode((String) rawPassword);
+            }
+
+            @Override
+            public boolean matches(CharSequence rawPassword, String encodedPassword) {
+                return encodedPassword.equals(MD5Util.encode((String) rawPassword));
+            }
+        });
     }
 
     @Override
@@ -38,10 +53,4 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .logout().permitAll();  //注销页面可任意访问
     }
 
-    @Autowired
-    public void configureGlobal(AuthenticationManagerBuilder auth) throws Exception {
-        auth
-                .inMemoryAuthentication()
-                .withUser("username").password("password").roles("ADMIN");  //这里ADMIN角色不能加ROLE前缀，框架会自动加，但是数据库中sys_role表需要加（例如ROLE_ADMIN)
-    }
 }
